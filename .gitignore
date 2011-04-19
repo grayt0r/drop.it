@@ -1,1 +1,10 @@
+# OSX
+.DS_Store
+
+# TextMate
+*.tmproj
+*.tmproject
+tmtags
+
+# drag.it
 bin/
