@@ -1,4 +1,4 @@
-class window.Dilit
+class window.Dilih
 	options =
 		revertOnDropOff: false
 		snap: 6
