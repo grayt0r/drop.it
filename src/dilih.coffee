@@ -1,26 +1,26 @@
 class window.Dilih
-	options =
-		revertOnDropOff: false
-		snap: 6
-		droppables: []
-		onStart: (thisEl) ->
-		onDrag: (thisEl) ->
-		onCancel: (thisEl) ->
-		onDrop: (thisEl) ->
-		onDropOn: (thisEl, dropEl) ->
-		onDropOff: (thisEl) ->
-		onComplete: (thisEl, dropEl) ->
-		onEnter: (thisEl, dropEl) ->
-		onLeave: (thisEl, dropEl) ->
 	
 	constructor: (el, o) ->
 		@element = $(el)
 		@document = $(@element.ownerDocument)
 		@overed = null
+		@options =
+			revertOnDropOff: true
+			snap: 6
+			droppables: []
+			onStart: (thisEl) ->
+			onDrag: (thisEl) ->
+			onCancel: (thisEl) ->
+			onDrop: (thisEl) ->
+			onDropOn: (thisEl, dropEl) ->
+			onDropOff: (thisEl) ->
+			onComplete: (thisEl, dropEl) ->
+			onEnter: (thisEl, dropEl) ->
+			onLeave: (thisEl, dropEl) ->
 		
-		$.extend options, o
+		$.extend @options, o
 		
-		@droppables = $(options.droppables)
+		@droppables = $(@options.droppables)
 		
 		@mouse =
 			'now': {}
@@ -63,8 +63,8 @@ class window.Dilih
 		
 		# @document
 		$(document).bind
-			mousemove: @check,
-			mouseup: @cancel,
+			mousemove: @check
+			mouseup: @cancel
 			mousedown: @eventStop
 	
 	check: (event) =>
@@ -73,25 +73,25 @@ class window.Dilih
 		distance = Math.round(Math.sqrt(Math.pow(event.pageX - @mouse.start.x, 2) + Math.pow(event.pageY - @mouse.start.y, 2)))
 		#console.log "[check] distance=#{distance}, options.snap=#{options.snap}"
 		
-		if distance > options.snap
+		if distance > @options.snap
 			@cancel()
 			
 			$(document).bind
-				mousemove: @drag,
+				mousemove: @drag
 				mouseup: @stop
 			
 			@element.trigger 'start', [@element]
-			options.onStart.call @, @element
+			@options.onStart.call @, @element
 		
 	drag: (event) =>
 		console.log "[drag]"
 		@mouse.now = 
-			x: event.pageX,
+			x: event.pageX
 			y: event.pageY
 		#console.log "[drag] @mouse.now.x=#{@mouse.now.x}, @mouse.now.y=#{@mouse.now.y}"
 		
 		@value.now = 
-			x: @mouse.now.x - @mouse.pos.x,
+			x: @mouse.now.x - @mouse.pos.x
 			y: @mouse.now.y - @mouse.pos.y
 		
 		#console.log "[drag] @value.now.x=#{@value.now.x}, @value.now.y=#{@value.now.y}"
@@ -101,13 +101,13 @@ class window.Dilih
 			'top': "#{@value.now.y}px"
 		
 		@element.trigger 'drag', [@element]
-		options.onDrag.call @, @element
+		@options.onDrag.call @, @element
 		
 		if @droppables.length then @checkDroppables()
 	
 	cancel: (event) =>
 		$(document).unbind
-			mousemove: @check,
+			mousemove: @check
 			mouseup: @cancel
 		
 		# why?
@@ -115,7 +115,7 @@ class window.Dilih
 			$(document).unbind 'mousedown', @eventStop
 			
 			@element.trigger 'cancel', [@element]
-			options.onCancel.call @, @element
+			@options.onCancel.call @, @element
 		
 	stop: (event) =>
 		console.log "[stop]"
@@ -123,24 +123,24 @@ class window.Dilih
 		@checkDroppables()
 		
 		@element.trigger 'drop', [@element, @overed]
-		options.onDrop.call @, @element, @overed
+		@options.onDrop.call @, @element, @overed
 		
 		if @overed.length
-			options.onDropOn.call @, @element, @overed
+			@options.onDropOn.call @, @element, @overed
 		else
-			if options.revertOnDropOff then @revert()
-			options.onDropOff.call @, @element
+			if @options.revertOnDropOff then @revert()
+			@options.onDropOff.call @, @element
 		
 		@overed = null
 		
 		$(document).unbind
-			mousemove: @drag,
-			mouseup: @stop,
+			mousemove: @drag
+			mouseup: @stop
 			mousedown: @eventStop
 		
 		if event
 			@element.trigger 'complete', [@element]
-			options.onComplete.call @, @element
+			@options.onComplete.call @, @element
 	
 	eventStop: (event) =>
 		return false
@@ -156,11 +156,11 @@ class window.Dilih
 		if @overed != overed
 			if @overed
 				@overed.trigger 'leave', [@element, @overed]
-				options.onLeave.call @, @element, @overed
+				@options.onLeave.call @, @element, @overed
 			
 			if overed
 				overed.trigger 'enter', [@element, overed]
-				options.onEnter.call @, @element, overed
+				@options.onEnter.call @, @element, overed
 			
 			@overed = overed
 		
@@ -176,5 +176,5 @@ class window.Dilih
 		
 	revert: ->
 		@element.animate
-			left: "#{@value.start.x}px",
+			left: "#{@value.start.x}px"
 			top: "#{@value.start.y}px"

@@ -2,11 +2,12 @@
 <html lang="en" style="height:100%; width:100%;">
 <head>
   <meta charset="utf-8">
-  <title>Simple drag.it example</title>
+  <title>Simple dilih example</title>
   
   <style media="screen" type="text/css">
-    .box { background: red; height: 100px; width: 100px; position: relative; left: 10px; top: 20px; }
-    .droppable { border: 1px solid blue; height: 300px; width: 300px; float: right; }
+    #drops { margin-top: 20px; }
+    .draggable { background: red; height: 100px; width: 100px; position: relative; }
+    .droppable { border: 1px solid blue; height: 200px; width: 200px; float: left; margin-right: 20px; }
     .dragging { background: green; }
     .over { background: black; }
   </style>
@@ -14,11 +15,15 @@
 
 <body style="height:100%; width:100%;">
 
-  <div id="container" style="height:100%; width:100%;">
+  <div id="container" style="height: 100%; width: 100%; padding: 20px;">
     
-    <div id="testy" class="box"></div>
+    <div id="drag1" class="draggable"></div>
     
-    <div id="testy2" class="droppable"></div>
+    <div id="drops">
+      <div id="drop1" class="droppable"></div>
+      <div id="drop2" class="droppable"></div>
+      <div id="drop3" class="droppable"></div>
+    </div><!-- #drops -->
     
   </div> <!--! end of #container -->
 
@@ -27,12 +32,8 @@
   <script>
     $(function() {
 
-      var el = $('#testy');
-      var el2 = $('#testy2');
-      
-      var tmp = new Dilih(el, {
+      var dilih = new Dilih('#drag1', {
         droppables: '.droppable',
-        revertOnDropOff: true,
         onStart: function(drag) {
           drag.addClass('dragging');
         },
