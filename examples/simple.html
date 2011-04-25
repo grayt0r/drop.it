@@ -34,6 +34,7 @@
 
       var dilih = new Dilih('#drag1', {
         droppables: '.droppable',
+        revertOnDropOff: false,
         onStart: function(drag) {
           drag.addClass('dragging');
         },

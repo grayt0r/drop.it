@@ -1,24 +1,24 @@
 class window.Dilih
 	
+	options =
+		revertOnDropOff: true
+		snap: 6
+		droppables: []
+		onStart: (thisEl) ->
+		onDrag: (thisEl) ->
+		onCancel: (thisEl) ->
+		onDrop: (thisEl) ->
+		onDropOn: (thisEl, dropEl) ->
+		onDropOff: (thisEl) ->
+		onComplete: (thisEl, dropEl) ->
+		onEnter: (thisEl, dropEl) ->
+		onLeave: (thisEl, dropEl) ->
+	
 	constructor: (el, o) ->
 		@element = $(el)
 		@document = $(@element.ownerDocument)
 		@overed = null
-		@options =
-			revertOnDropOff: true
-			snap: 6
-			droppables: []
-			onStart: (thisEl) ->
-			onDrag: (thisEl) ->
-			onCancel: (thisEl) ->
-			onDrop: (thisEl) ->
-			onDropOn: (thisEl, dropEl) ->
-			onDropOff: (thisEl) ->
-			onComplete: (thisEl, dropEl) ->
-			onEnter: (thisEl, dropEl) ->
-			onLeave: (thisEl, dropEl) ->
-		
-		$.extend @options, o
+		@options = $.extend {}, options, o
 		
 		@droppables = $(@options.droppables)
 		
