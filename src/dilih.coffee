@@ -1,10 +1,16 @@
 class window.Dilih
 	
 	options =
-		revertOnDropOff: false
-		snap: 6
 		draggables: '.draggable'
 		droppables: '.droppable'
+		snap: 6
+		revertOnDropOff: false
+		delegateDrag: false
+		delegateContainer: 'body'
+		delegateSelector: '.draggable'
+		updateDroppablesOnDrag: false
+		ghost: false
+		# TODO: Best way to handle events?
 		onStart: (thisEl) ->
 		onDrag: (thisEl) ->
 		onCancel: (thisEl) ->
@@ -15,89 +21,65 @@ class window.Dilih
 		onEnter: (thisEl, dropEl) ->
 		onLeave: (thisEl, dropEl) ->
 		onRevertComplete: (thisEl) ->
-		
-		delegateDrag: false
-		delegateContainer: 'body'
-		delegateSelector: '.draggable'
-		updateDroppablesOnDrag: false
-		cloneDrag: false
 	
 	constructor: (o) ->
 		@options = $.extend {}, options, o
 		@draggables = $(@options.draggables)
-		@overed = null
+		@activeDrops = null
 		
 		@updateDroppables()
 		
-		@mouse =
-			'now': {}
-			'pos': {}
-			'start': {}
-		@value =
-			'start': {}
-			'now': {}
+		@positions =
+			'mouse':
+				'start': {}
+				'current': {}
+			'element':
+				'start': {}
+				'current': {}
+			'offset': {}
 			
-		@attach()
-		
-	attach: ->
+		# Attach initial events
 		if @options.delegateDrag
-			$(@options.delegateContainer).delegate @options.delegateSelector, 'mousedown', (event) =>
-				@element = $(event.target)
-				@start event
+			$(@options.delegateContainer).delegate @options.delegateSelector, 'mousedown', @start
 		else
-			@draggables.bind 'mousedown', (event) =>
-				@element = $(event.target)
-				@start event
-		
-	detach: ->
-		@element.unbind 'mousedown', @start
+			@draggables.bind 'mousedown', @start
 
 	start: (event) =>
-		# if it's not a left click, do nothing
+		# If it's not a left click, do nothing
 		if (event.which != 1) then return
 		
-		if @options.cloneDrag
+		@element = $(event.target)
+		
+		if @options.ghost
 			currentOffset = @element.offset()
-			@element = @element.clone().css
+			@element = @element.clone().css({
 				'opacity': 0.5
 				'position': 'absolute'
 				'left': currentOffset.left
 				'top': currentOffset.top
-			$('body').append @element
+			}).appendTo($('body'))
 		
-		@mouse.start = 
+		@positions.mouse.start = 
 			x: event.pageX
 			y: event.pageY
-		#console.log "[start] mouse.start x,y = #{@mouse.start.x},#{@mouse.start.y}"
 		
-		# clone?
-		@value.start =
-			x: parseInt(@element.css('left')) || 0
-			y: parseInt(@element.css('top')) || 0
+		@positions.element.start =
+			x: parseInt(@element.css 'left') || 0
+			y: parseInt(@element.css 'top') || 0
 		
-		@value.now =
-			x: parseInt(@element.css('left')) || 0
-			y: parseInt(@element.css('top')) || 0
-		#console.log "[start] value.now x,y = #{@value.now.x},#{@value.now.y}"
+		@positions.offset =
+			x: @positions.mouse.start.x - @positions.element.start.x
+			y: @positions.mouse.start.y - @positions.element.start.y
 		
-		@mouse.pos =
-			x: @mouse.start.x - @value.now.x
-			y: @mouse.start.y - @value.now.y
-		
-		# right place?
 		if @options.updateDroppablesOnDrag then @updateDroppables()
 				
-		# @document
 		$(document).bind
 			mousemove: @check
 			mouseup: @cancel
 			mousedown: @eventStop
 	
 	check: (event) =>
-		console.log "[check]"
-		
-		distance = Math.round(Math.sqrt(Math.pow(event.pageX - @mouse.start.x, 2) + Math.pow(event.pageY - @mouse.start.y, 2)))
-		#console.log "[check] distance=#{distance}, options.snap=#{options.snap}"
+		distance = Math.round(Math.sqrt(Math.pow(event.pageX - @positions.mouse.start.x, 2) + Math.pow(event.pageY - @positions.mouse.start.y, 2)))
 		
 		if distance > @options.snap
 			@cancel()
@@ -106,104 +88,104 @@ class window.Dilih
 				mousemove: @drag
 				mouseup: @stop
 			
+			# TODO: Sort events
 			@element.trigger 'start', [@element]
 			@options.onStart.call @, @element
-		
-	drag: (event) =>
-		console.log "[drag]"
-		@mouse.now = 
-			x: event.pageX
-			y: event.pageY
-		#console.log "[drag] @mouse.now.x=#{@mouse.now.x}, @mouse.now.y=#{@mouse.now.y}"
-		
-		@value.now = 
-			x: @mouse.now.x - @mouse.pos.x
-			y: @mouse.now.y - @mouse.pos.y
-		
-		#console.log "[drag] @value.now.x=#{@value.now.x}, @value.now.y=#{@value.now.y}"
-		
-		@element.css
-			'left': "#{@value.now.x}px"
-			'top': "#{@value.now.y}px"
-		
-		@element.trigger 'drag', [@element]
-		@options.onDrag.call @, @element
-		
-		if @droppables.length then @checkDroppables()
 	
 	cancel: (event) =>
 		$(document).unbind
 			mousemove: @check
 			mouseup: @cancel
-		
-		# why?
+
+		# If the cancel is triggered by the user, remove the remaining events
 		if event
 			$(document).unbind 'mousedown', @eventStop
 			
+			# TODO: Sort events
 			@element.trigger 'cancel', [@element]
 			@options.onCancel.call @, @element
+	
+	eventStop: -> return false
 		
+	drag: (event) =>
+		@positions.mouse.current = 
+			x: event.pageX
+			y: event.pageY
+		
+		@positions.element.current = 
+			x: @positions.mouse.current.x - @positions.offset.x
+			y: @positions.mouse.current.y - @positions.offset.y
+		
+		@element.css
+			'left': "#{@positions.element.current.x}px"
+			'top': "#{@positions.element.current.y}px"
+		
+		# TODO: Sort events
+		@element.trigger 'drag', [@element]
+		@options.onDrag.call @, @element
+		
+		if @droppables.length then @checkDroppables()
+	
 	stop: (event) =>
-		console.log "[stop]"
-		
 		@checkDroppables()
 		
-		@element.trigger 'drop', [@element, @overed]
-		@options.onDrop.call @, @element, @overed
+		# TODO: Sort events
+		@element.trigger 'drop', [@element, @activeDrops]
+		@options.onDrop.call @, @element, @activeDrops
 		
-		if @overed.length
-			@options.onDropOn.call @, @element, @overed
+		if @activeDrops.length
+			@options.onDropOn.call @, @element, @activeDrops
 		else
 			if @options.revertOnDropOff then @revert()
 			@options.onDropOff.call @, @element
 		
-		@overed = null
+		@activeDrops = null
 		
 		$(document).unbind
 			mousemove: @drag
 			mouseup: @stop
 			mousedown: @eventStop
 		
-		if event
-			@element.trigger 'complete', [@element]
-			@options.onComplete.call @, @element
-	
-	eventStop: (event) =>
-		return false
+		# TODO: Sort events
+		@element.trigger 'complete', [@element]
+		@options.onComplete.call @, @element
 	
 	checkDroppables: ->
-		overed_array = @droppables.filter (i, el) =>
+		# Calculate which (if any) droppables the mouse is currently over
+		activeDrops = @droppables.filter((i, el) =>
 			d = @getDroppableCoordinates(el)
-			now = @mouse.now
-			now.x > d.left && now.x < d.right && now.y < d.bottom && now.y > d.top
+			mc = @positions.mouse.current
+			mc.x > d.left && mc.x < d.right && mc.y < d.bottom && mc.y > d.top
+		).last()
 		
-		overed = overed_array.last()
-		
-		if @overed != overed
-			if @overed
-				@overed.trigger 'leave', [@element, @overed]
-				@options.onLeave.call @, @element, @overed
+		if @activeDrops != activeDrops
+			if @activeDrops
+				# TODO: Sort events
+				@activeDrops.trigger 'leave', [@element, @activeDrops]
+				@options.onLeave.call @, @element, @activeDrops
 			
-			if overed
-				overed.trigger 'enter', [@element, overed]
-				@options.onEnter.call @, @element, overed
+			if activeDrops
+				# TODO: Sort events
+				activeDrops.trigger 'enter', [@element, activeDrops]
+				@options.onEnter.call @, @element, activeDrops
 			
-			@overed = overed
+			@activeDrops = activeDrops
 		
 	getDroppableCoordinates: (el) ->
 		el = $(el)
 		offset = el.offset()
-		position =
+		return {
 			left: offset.left
 			right: offset.left + el.width()
 			top: offset.top
 			bottom: offset.top + el.height()
-		# TODO: deal with fixed elements
+		}
+		# TODO: Deal with fixed elements
 		
 	revert: ->
 		@element.animate({
-			left: "#{@value.start.x}px"
-			top: "#{@value.start.y}px"
+			left: "#{@positions.element.start.x}px"
+			top: "#{@positions.element.start.y}px"
 		}, =>
 			@options.onRevertComplete.call @, @element
 		)
