@@ -1,9 +1,10 @@
 class window.Dilih
 	
 	options =
-		revertOnDropOff: true
+		revertOnDropOff: false
 		snap: 6
-		droppables: []
+		draggables: '.draggable'
+		droppables: '.droppable'
 		onStart: (thisEl) ->
 		onDrag: (thisEl) ->
 		onCancel: (thisEl) ->
@@ -13,14 +14,20 @@ class window.Dilih
 		onComplete: (thisEl, dropEl) ->
 		onEnter: (thisEl, dropEl) ->
 		onLeave: (thisEl, dropEl) ->
-	
-	constructor: (el, o) ->
-		@element = $(el)
-		@document = $(@element.ownerDocument)
-		@overed = null
-		@options = $.extend {}, options, o
+		onRevertComplete: (thisEl) ->
 		
-		@droppables = $(@options.droppables)
+		delegateDrag: false
+		delegateContainer: 'body'
+		delegateSelector: '.draggable'
+		updateDroppablesOnDrag: false
+		cloneDrag: false
+	
+	constructor: (o) ->
+		@options = $.extend {}, options, o
+		@draggables = $(@options.draggables)
+		@overed = null
+		
+		@updateDroppables()
 		
 		@mouse =
 			'now': {}
@@ -33,7 +40,14 @@ class window.Dilih
 		@attach()
 		
 	attach: ->
-		@element.bind 'mousedown', @start
+		if @options.delegateDrag
+			$(@options.delegateContainer).delegate @options.delegateSelector, 'mousedown', (event) =>
+				@element = $(event.target)
+				@start event
+		else
+			@draggables.bind 'mousedown', (event) =>
+				@element = $(event.target)
+				@start event
 		
 	detach: ->
 		@element.unbind 'mousedown', @start
@@ -41,6 +55,15 @@ class window.Dilih
 	start: (event) =>
 		# if it's not a left click, do nothing
 		if (event.which != 1) then return
+		
+		if @options.cloneDrag
+			currentOffset = @element.offset()
+			@element = @element.clone().css
+				'opacity': 0.5
+				'position': 'absolute'
+				'left': currentOffset.left
+				'top': currentOffset.top
+			$('body').append @element
 		
 		@mouse.start = 
 			x: event.pageX
@@ -61,6 +84,9 @@ class window.Dilih
 			x: @mouse.start.x - @value.now.x
 			y: @mouse.start.y - @value.now.y
 		
+		# right place?
+		if @options.updateDroppablesOnDrag then @updateDroppables()
+				
 		# @document
 		$(document).bind
 			mousemove: @check
@@ -166,15 +192,21 @@ class window.Dilih
 		
 	getDroppableCoordinates: (el) ->
 		el = $(el)
-		p = el.position()
+		offset = el.offset()
 		position =
-			left: p.left
-			right: p.left + el.width()
-			top: p.top
-			bottom: p.top + el.height()
+			left: offset.left
+			right: offset.left + el.width()
+			top: offset.top
+			bottom: offset.top + el.height()
 		# TODO: deal with fixed elements
 		
 	revert: ->
-		@element.animate
+		@element.animate({
 			left: "#{@value.start.x}px"
 			top: "#{@value.start.y}px"
+		}, =>
+			@options.onRevertComplete.call @, @element
+		)
+	
+	updateDroppables: (selector = @options.droppables) ->
+		@droppables = $(selector)

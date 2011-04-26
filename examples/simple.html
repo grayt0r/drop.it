@@ -1,40 +1,265 @@
 <!DOCTYPE html>
-<html lang="en" style="height:100%; width:100%;">
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Simple dilih example</title>
+  <title>dilih examples</title>
   
   <style media="screen" type="text/css">
-    #drops { margin-top: 20px; }
-    .draggable { background: red; height: 100px; width: 100px; position: relative; }
-    .droppable { border: 1px solid blue; height: 200px; width: 200px; float: left; margin-right: 20px; }
-    .dragging { background: green; }
+    body { font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif; font-size: 15px; line-height: 22px; color: #252519; }
+    a { color: inherit; text-decoration: underline; margin-right: 0.5em; }
+    h1, h2 { margin: 0; }
+    .container { padding: 20px; }
+    ol#examples li { margin: 30px 0; }
+    .clearFloats { clear: both; height: 1px; }
+    .addLinks { margin: 1em 0; }
+    .drags { height: 60px; margin-top: 5px; position: relative; }
+    .drops { margin-top: 5px; }
+    .draggable { background: red; height: 50px; width: 50px; position: absolute; margin-right: 20px; z-index: 100; cursor: pointer; }
+    .droppable { border: 1px solid blue; height: 100px; width: 100px; float: left; margin-right: 20px; }
+    .dragging { background: green; z-index: 101; }
     .over { background: black; }
   </style>
 </head>
 
-<body style="height:100%; width:100%;">
+<body>
+  <div class="container">
+    <h1>Examples</h1>
 
-  <div id="container" style="height: 100%; width: 100%; padding: 20px;">
+    <ol id="examples">
+      <li>
+        <h2>Simple</h2>
     
-    <div id="drag1" class="draggable"></div>
+        <div id="drags1" class="drags">
+          <div class="draggable"></div>
+        </div>
     
-    <div id="drops">
-      <div id="drop1" class="droppable"></div>
-      <div id="drop2" class="droppable"></div>
-      <div id="drop3" class="droppable"></div>
-    </div><!-- #drops -->
+        <div id="drops1" class="drops">
+          <div class="droppable"></div>
+          <div class="droppable"></div>
+          <div class="droppable"></div>
+          <div class="clearFloats"></div>
+        </div>
+      </li>
+
+      <li>
+        <h2>Revert when not dropped on droppable</h2>
     
-  </div> <!--! end of #container -->
+        <div id="drags2" class="drags">
+          <div class="draggable"></div>
+        </div>
+    
+        <div id="drops2" class="drops">
+          <div class="droppable"></div>
+          <div class="droppable"></div>
+          <div class="droppable"></div>
+          <div class="clearFloats"></div>
+        </div>
+      </li>
+    
+      <li>
+        <h2>Multiple drags with revert</h2>
+        <p>NOTE: Added draggables will NOT be draggable</p>
+        
+        <div class="addLinks">
+          <a href="#" class="addDrag" data-id="3">Add draggable</a>
+        </div>
+    
+        <div id="drags3" class="drags">
+          <div class="draggable"></div>
+          <div class="draggable" style="left: 60px;"></div>
+        </div>
+    
+        <div id="drops3" class="drops">
+          <div class="droppable"></div>
+          <div class="droppable"></div>
+          <div class="droppable"></div>
+          <div class="clearFloats"></div>
+        </div>
+      </li>
+    
+      <li>
+        <h2>Delegated multiple drags with revert</h2>
+        <p>NOTE: Added droppables will NOT be droppable</p>
+    
+        <div class="addLinks">
+          <a href="#" class="addDrag" data-id="4">Add draggable</a>
+          <a href="#" class="addDrop" data-id="4">Add droppable</a>
+        </div>
+    
+        <div id="drags4" class="drags">
+          <div class="draggable"></div>
+          <div class="draggable" style="left: 60px;"></div>
+        </div>
+    
+        <div id="drops4" class="drops">
+          <div class="droppable"></div>
+          <div class="droppable"></div>
+          <div class="droppable"></div>
+          <div class="clearFloats"></div>
+        </div>
+      </li>
+    
+      <li>
+        <h2>Delegated multiple drags with revert, droppables updated on drag</h2>
+    
+        <div class="addLinks">
+          <a href="#" class="addDrag" data-id="5">Add draggable</a>
+          <a href="#" class="addDrop" data-id="5">Add droppable</a>
+        </div>
+    
+        <div id="drags5" class="drags">
+          <div class="draggable"></div>
+          <div class="draggable" style="left: 60px;"></div>
+        </div>
+    
+        <div id="drops5" class="drops">
+          <div class="droppable"></div>
+          <div class="droppable"></div>
+          <div class="droppable"></div>
+          <div class="clearFloats"></div>
+        </div>
+      </li>
+    
+      <li>
+        <h2>As above, plus ghost element used for drag</h2>
+    
+        <div class="addLinks">
+          <a href="#" class="addDrag" data-id="6">Add draggable</a>
+          <a href="#" class="addDrop" data-id="6">Add droppable</a>
+        </div>
+    
+        <div id="drags6" class="drags">
+          <div class="draggable"></div>
+          <div class="draggable" style="left: 60px;"></div>
+        </div>
+    
+        <div id="drops6" class="drops">
+          <div class="droppable"></div>
+          <div class="droppable"></div>
+          <div class="droppable"></div>
+          <div class="clearFloats"></div>
+        </div>
+      </li>
+    </ol>
+  </div>
 
   <script src="../libs/jquery-1.5.2.js"></script>
   <script src="../bin/dilih.js"></script>
   <script>
     $(function() {
+      
+      $('.addDrag').click(function(ev) {
+        ev.preventDefault();
+        var drags = $('#drags' + $(this).data('id'));
+        var count = drags.children('.draggable').length;
+        drags.append($('<div class="draggable"></div>').css('left', count*60 + 'px'));
+      });
+      
+      $('.addDrop').click(function(ev) {
+        ev.preventDefault();
+        var drops = $('#drops' + $(this).data('id'));
+        drops.children('.droppable:last').after($('<div class="droppable"></div>'));
+      });
+      
+      var d1 = new Dilih({
+        draggables: '#drags1 .draggable',
+        droppables: '#drops1 .droppable',
+        onStart: function(drag) {
+          drag.addClass('dragging');
+        },
+        onComplete: function(drag) {
+          drag.removeClass('dragging');
+        },
+        onEnter: function(drag, drop) {
+          drop.addClass('over');
+        },
+        onLeave: function(drag, drop) {
+          drop.removeClass('over');
+        }
+      });
+      
+      var d2 = new Dilih({
+        draggables: '#drags2 .draggable',
+        droppables: '#drops2 .droppable',
+        revertOnDropOff: true,
+        onStart: function(drag) {
+          drag.addClass('dragging');
+        },
+        onComplete: function(drag) {
+          drag.removeClass('dragging');
+        },
+        onEnter: function(drag, drop) {
+          drop.addClass('over');
+        },
+        onLeave: function(drag, drop) {
+          drop.removeClass('over');
+        }
+      });
+      
+      var d3 = new Dilih({
+        draggables: '#drags3 .draggable',
+        droppables: '#drops3 .droppable',
+        revertOnDropOff: true,
+        onStart: function(drag) {
+          drag.addClass('dragging');
+        },
+        onComplete: function(drag) {
+          drag.removeClass('dragging');
+        },
+        onEnter: function(drag, drop) {
+          drop.addClass('over');
+        },
+        onLeave: function(drag, drop) {
+          drop.removeClass('over');
+        }
+      });
+      
+      var d4 = new Dilih({
+        droppables: '#drops4 .droppable',
+        revertOnDropOff: true,
+        delegateDrag: true,
+        delegateContainer: '#drags4',
+        onStart: function(drag) {
+          drag.addClass('dragging');
+        },
+        onComplete: function(drag) {
+          drag.removeClass('dragging');
+        },
+        onEnter: function(drag, drop) {
+          drop.addClass('over');
+        },
+        onLeave: function(drag, drop) {
+          drop.removeClass('over');
+        }
+      });
 
-      var dilih = new Dilih('#drag1', {
-        droppables: '.droppable',
-        revertOnDropOff: false,
+      var d5 = new Dilih({
+        droppables: '#drops5 div.droppable',
+        revertOnDropOff: true,
+        delegateDrag: true,
+        delegateContainer: '#drags5',
+        updateDroppablesOnDrag: true,
+        onStart: function(drag) {
+          drag.addClass('dragging');
+        },
+        onComplete: function(drag) {
+          drag.removeClass('dragging');
+        },
+        onEnter: function(drag, drop) {
+          drop.addClass('over');
+        },
+        onLeave: function(drag, drop) {
+          drop.removeClass('over');
+        }
+      });
+      
+      var d6 = new Dilih({
+        droppables: '#drops6 div.droppable',
+        revertOnDropOff: true,
+        delegateDrag: true,
+        delegateContainer: '#drags6',
+        updateDroppablesOnDrag: true,
+        cloneDrag: true,
         onStart: function(drag) {
           drag.addClass('dragging');
         },
@@ -47,11 +272,8 @@
         onLeave: function(drag, drop) {
           drop.removeClass('over');
         },
-        onDropOn: function() {
-          
-        },
-        onDropOff: function() {
-          
+        onRevertComplete: function(drag) {
+          drag.remove();
         }
       });
       
