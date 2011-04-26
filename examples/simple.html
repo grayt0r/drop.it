@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>dilih examples</title>
+  <title>drop.it examples</title>
   
   <style media="screen" type="text/css">
     body { font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif; font-size: 15px; line-height: 22px; color: #252519; }
@@ -144,7 +144,7 @@
   </div>
 
   <script src="../libs/jquery-1.5.2.js"></script>
-  <script src="../bin/dilih.js"></script>
+  <script src="../bin/drop.it.js"></script>
   <script>
     $(function() {
       
@@ -161,7 +161,7 @@
         drops.children('.droppable:last').after($('<div class="droppable"></div>'));
       });
       
-      var d1 = new Dilih({
+      var d1 = new DropIt({
         draggables: '#drags1 .draggable',
         droppables: '#drops1 .droppable',
         onStart: function(drag) {
@@ -178,7 +178,7 @@
         }
       });
       
-      var d2 = new Dilih({
+      var d2 = new DropIt({
         draggables: '#drags2 .draggable',
         droppables: '#drops2 .droppable',
         revertOnDropOff: true,
@@ -196,7 +196,7 @@
         }
       });
       
-      var d3 = new Dilih({
+      var d3 = new DropIt({
         draggables: '#drags3 .draggable',
         droppables: '#drops3 .droppable',
         revertOnDropOff: true,
@@ -214,7 +214,7 @@
         }
       });
       
-      var d4 = new Dilih({
+      var d4 = new DropIt({
         droppables: '#drops4 .droppable',
         revertOnDropOff: true,
         delegateDrag: true,
@@ -233,7 +233,7 @@
         }
       });
 
-      var d5 = new Dilih({
+      var d5 = new DropIt({
         droppables: '#drops5 div.droppable',
         revertOnDropOff: true,
         delegateDrag: true,
@@ -253,7 +253,7 @@
         }
       });
       
-      var d6 = new Dilih({
+      var d6 = new DropIt({
         droppables: '#drops6 div.droppable',
         revertOnDropOff: true,
         delegateDrag: true,

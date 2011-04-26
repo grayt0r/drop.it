@@ -1,4 +1,4 @@
-class window.Dilih
+class window.DropIt
 	
 	options =
 		draggables: '.draggable'
